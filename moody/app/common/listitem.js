@@ -16,7 +16,7 @@ export class ListItem extends React.PureComponent {
             <Text style={{ fontWeight: "bold", paddingTop: 7, paddingBottom: 7 }}>{this.props.title}</Text>
             <Text>{this.props.description}</Text>
           </View>
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: GREY }}><Icon size={30} name="info-outline" color={GREY} /></View>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: GREY }}><Icon size={30} name="info" color={GREY} /></View>
         </View>
       </TouchableOpacity>
     );
