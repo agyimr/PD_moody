@@ -1,8 +1,8 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { View, Text, Button, DatePickerAndroid, SectionList } from 'react-native';
+import { View, Text, Button, DatePickerAndroid, SectionList, TouchableOpacity } from 'react-native';
 import { ListItem } from './common/listitem';
-import { GREY, WHITE, PINK } from './common/colors';
+import { GREY, WHITE, PRIMARY } from './common/colors';
 
 export class DiaryScreen extends React.Component {
   dummyData = [
@@ -39,30 +39,24 @@ export class DiaryScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <Button onPress={this.pickDate} title="Search">Search...</Button>
         <SectionList
-          style={{ paddingLeft: 15, paddingRight: 15, paddingBottom: 15 }}
+          style={{ paddingLeft: 15, paddingRight: 15 }}
           sections={this.dummyData}
           renderSectionHeader={({section}) => this.renderHeader(section)}
           stickySectionHeadersEnabled={true}
           renderItem={({item}) => <ListItem title={item.title} description={item.description} key={item.key} />}
         />
-        <View 
+        <TouchableOpacity onPress={this.pickDate} 
+          title="Search"
+          style={[floating, { right: 20, bottom: 110, backgroundColor: PRIMARY } ]}>
+          <Icon name="search" size={30} color={WHITE} />
+        </TouchableOpacity>
+        <TouchableOpacity 
           onPress={this.onRateTodayPress} 
           title="Addrate" 
-          style={{ 
-            position: "absolute",
-            right: 30, 
-            bottom: 30, 
-            width: 70, 
-            height: 70, 
-            borderRadius: 35, 
-            backgroundColor: PINK, 
-            justifyContent: 'center', 
-            alignItems: 'center',
-            elevation: 10}}>
+          style={[floating, { right: 20, bottom: 20, backgroundColor: PRIMARY }]}>
           <Icon name="add" size={30} color={WHITE} />
-        </View>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -84,3 +78,13 @@ export class DiaryScreen extends React.Component {
     return `${months[date.getMonth()]} ${date.getFullYear()}`;
   }
 }
+
+const floating = {
+  width: 70,
+  height: 70,
+  position: "absolute",
+  borderRadius: 35, 
+  justifyContent: 'center', 
+  alignItems: 'center',
+  elevation: 10
+};
