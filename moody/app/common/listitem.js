@@ -9,7 +9,7 @@ export class ListItem extends React.PureComponent {
 
   render() {
     return (
-      <TouchableOpacity style={{height: 95}}>
+      <TouchableOpacity style={{height: 95}} onPress={this.props.onPress}>
         <View style={{ display: "flex", flexDirection: "row", height: "100%" }}>
           <View style={{ height: "100%", width: 10, backgroundColor: LIGHT_PRIMARY }}></View>
           <View style={{ display: "flex", flexDirection: "column", borderBottomWidth: 1, paddingLeft: 15, borderBottomColor: GREY, flex: 7 }}>
