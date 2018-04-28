@@ -1,10 +1,12 @@
-import { StackNavigator } from 'react-navigation';
-import { HomeScreen } from './app/home';
-import { RateScreen } from './app/rate';
+import { TabNavigator } from 'react-navigation';
+import { DiaryScreen } from './app/home_diary';
+import { GraphsScreen } from './app/graphs';
+import { StatisticsScreen } from './app/statistics';
 
-const Router = StackNavigator({
-  Home: { screen: HomeScreen },
-  Rate: { screen: RateScreen },
-});
+const Router = TabNavigator({
+  Diary: { screen: DiaryScreen },
+  Statistics: { screen: StatisticsScreen },
+  Graphs: { screen: GraphsScreen },
+}, { order: ['Statistics', 'Diary', 'Graphs'], initialRouteName: 'Diary' });
 
 export { Router };
