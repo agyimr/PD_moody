@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { Card } from './common/card';
-import { GREY, BLACK } from './common/colors';
+import { PRIMARY, GREY, BLACK } from './common/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { BarChart, XAxis } from 'react-native-svg-charts';
+import { BarChart, YAxis, XAxis } from 'react-native-svg-charts';
+import * as scale from 'd3-scale';
 
 export class StatisticsScreen extends React.Component {
 
@@ -11,47 +12,58 @@ export class StatisticsScreen extends React.Component {
 
   renderCards() {
     const data = [
-      [70,40,100],
-      [30,10,40],
-      [80,70,90],
-      [70,30,60]
+      [
+        { label: 'happiness', value: 100 },
+        { label: 'sentiment', value: 10 },
+        { label: 'social life', value: 10 }
+      ],
+      [
+        { label: 'happiness', value: 10 },
+        { label: 'sentiment', value: 100 },
+        { label: 'social life', value: 10 }
+      ],
+      [
+        { label: 'happiness', value: 100 },
+        { label: 'sentiment', value: 100 },
+        { label: 'social life', value: 100 }
+      ],
+      [
+        { label: 'happiness', value: 50 },
+        { label: 'sentiment', value: 10 },
+        { label: 'social life', value: 50 }
+      ]
     ];
 
     const stats = [
-      // {
-      //   title: 'Work',
-      //   icon: 'business-center',
-      //   happiness: 70,
-      //   sentiment: 40,
-      //   social_life: 100,
-      //   note: 'You seem to enjoy working, keep on!'
-      // },
-      // {
-      //   title: 'Study',
-      //   happiness: 30,
-      //   sentiment: 10,
-      //   social_life: 40,
-      //   note: 'You should consider changing edu-line.'
-      // },
-      // {
-      //   title: 'Family',
-      //   happiness: 80,
-      //   sentiment: 70,
-      //   social_life: 90,
-      //   note: 'Spend more time with your family'
-      // },
+      {
+        title: 'Work',
+        icon: 'business-center',
+        note: 'You seem to enjoy working, keep on!'
+      },
+      {
+        title: 'Study',
+        icon: 'school',
+        note: 'You should consider changing edu-line.'
+      },
+      {
+        title: 'Family',
+        icon: 'people',
+        note: 'Spend more time with your family'
+      },
       {
         title: 'Sport',
         icon: 'directions-bike',
-        happiness: 70,
-        sentiment: 30,
-        social_life: 60,
         note: 'You feel comfortable doing sport, that\'s cool!'
       }
     ];
 
+    const axesSvg = { fontSize: 14, fill: 'grey' };
+    const verticalContentInset = { top: 10, bottom: 10 };
+    const xAxisHeight = 10;
+    const fill = PRIMARY;
+
     return stats.map((cardData, index) => {
-      const fill = 'rgb(134, 65, 244)'
+      chartNumbers = data[index]
       return (
         <Card key={cardData.title}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -61,12 +73,32 @@ export class StatisticsScreen extends React.Component {
             </View>
             <Icon name={cardData.icon} size={100} color={GREY} />
           </View>
-          <BarChart
-            style={{ height: 200 }}
-            data={data[index]}
-            svg={{ fill }}
-            contentInset={{ top: 30, bottom: 30 }}
-          />
+          <View style={{ height: 150, flexDirection: 'row', paddingTop: 10 }}>
+            <View style={{ flex: 1, marginLeft: 10 }}>
+              <BarChart
+                style={{ height: 100 }}
+                data={chartNumbers}
+                spacingInner={0.5}
+                spacingOuter={0.2}
+                gridMax={100}
+                gridMin={0}
+                yAccessor={({ item }) => item.value}
+                xAccessor={({ item }) => item.label}
+                contentInset={verticalContentInset}
+                svg={{ fill }}
+              />
+              <XAxis
+                style={{ marginHorizontal: 0, height: xAxisHeight }}
+                data={chartNumbers}
+                scale={scale.scaleBand}
+                spacingInner={0.6}
+                spacingOuter={0.2}
+                formatLabel={(value, index) => chartNumbers[index].label}
+                contentInset={{ left: 10, right: 10 }}
+                svg={axesSvg}
+              />
+            </View>
+          </View>
         </Card>
       )
     });
@@ -76,10 +108,6 @@ export class StatisticsScreen extends React.Component {
 
     return (
       <ScrollView style={{ flex: 1 }}>
-        <Card>
-          <Text style={{ fontWeight: 'bold', fontSize: 40 }}>Happiness</Text>
-          <Text style={{ fontSize: 14 }}>What happened lately?</Text>
-        </Card>
         {this.renderCards()}
       </ScrollView>
     );
