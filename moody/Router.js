@@ -4,6 +4,7 @@ import { DiaryDetail } from './app/diary_detail';
 import { GraphsScreen } from './app/graphs';
 import { GraphsDetail } from './app/graphs_detail';
 import { StatisticsScreen } from './app/statistics';
+import { StatisticsDetail } from './app/statictics_detail';
 import { PRIMARY } from './app/common/colors';
 
 const DiaryStack = StackNavigator(
@@ -14,7 +15,7 @@ const DiaryStack = StackNavigator(
   { initialRouteName: 'Diary', headerMode: 'none' }
 );
 
-const GraphStack = StackNavigator(
+const GraphsStack = StackNavigator(
   {
     Graphs: { screen: GraphsScreen },
     GraphsDetail: { screen: GraphsDetail },
@@ -22,10 +23,18 @@ const GraphStack = StackNavigator(
   { initialRouteName: 'Graphs', headerMode: 'none' }
 );
 
+const StatisticsStack = StackNavigator(
+  {
+    Statistics: { screen: StatisticsScreen },
+    StatisticsDetail: { screen: StatisticsDetail },
+  },
+  { initialRouteName: 'Statistics', headerMode: 'none' }
+);
+
 const Router = TabNavigator({
   Diary: { screen: DiaryStack },
-  Statistics: { screen: StatisticsScreen },
-  Graphs: { screen: GraphStack },
+  Statistics: { screen: StatisticsStack },
+  Graphs: { screen: GraphsStack },
 }, { order: ['Statistics', 'Diary', 'Graphs'], initialRouteName: 'Diary', tabBarOptions: { style: { backgroundColor: PRIMARY } } });
 
 export { Router };
