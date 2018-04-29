@@ -1,13 +1,31 @@
-import { TabNavigator } from 'react-navigation';
+import { TabNavigator, StackNavigator } from 'react-navigation';
 import { DiaryScreen } from './app/home_diary';
+import { DiaryDetail } from './app/diary_detail';
 import { GraphsScreen } from './app/graphs';
+import { GraphsDetail } from './app/graphs_detail';
 import { StatisticsScreen } from './app/statistics';
 import { PRIMARY } from './app/common/colors';
 
+const DiaryStack = StackNavigator(
+  {
+    Diary: { screen: DiaryScreen },
+    DiaryDetail: { screen: DiaryDetail },
+  },
+  { initialRouteName: 'Diary', headerMode: 'none' }
+);
+
+const GraphStack = StackNavigator(
+  {
+    Graphs: { screen: GraphsScreen },
+    GraphsDetail: { screen: GraphsDetail },
+  },
+  { initialRouteName: 'Graphs', headerMode: 'none' }
+);
+
 const Router = TabNavigator({
-  Diary: { screen: DiaryScreen },
+  Diary: { screen: DiaryStack },
   Statistics: { screen: StatisticsScreen },
-  Graphs: { screen: GraphsScreen },
+  Graphs: { screen: GraphStack },
 }, { order: ['Statistics', 'Diary', 'Graphs'], initialRouteName: 'Diary', tabBarOptions: { style: { backgroundColor: PRIMARY } } });
 
 export { Router };
