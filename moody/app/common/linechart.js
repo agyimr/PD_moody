@@ -14,7 +14,7 @@ export class CustomLineChart extends React.PureComponent {
     }
 
     render() {
-        const axesSvg = { fontSize: 10, fill: 'grey' };
+        const axesSvg = { fontSize: 14, fill: 'grey' };
         const verticalContentInset = { top: 10, bottom: 10 };
         const xAxisHeight = 10;
 
@@ -41,7 +41,7 @@ export class CustomLineChart extends React.PureComponent {
                 <XAxis
                     style={{ marginHorizontal: -10, height: xAxisHeight }}
                     data={this.props.data}
-                    xAccessor={({item}) => item.date}
+                    // xAccessor={({item}) => item.date}
                     formatLabel={(value, index) => (index % 15 === 7 ? this.formatDate(value) : "")}
                     contentInset={{ left: 10, right: 10 }}
                     svg={axesSvg}
