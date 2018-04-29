@@ -43,7 +43,7 @@ export class GraphsScreen extends React.Component {
   render() {
     const webviewContent = require('./wordcloud/index.html')
     return (
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1, backgroundColor: GREY, paddingTop: 4 }}>
         <Card>
           <Text style={{ fontWeight: 'bold', fontSize: 40, color: BLACK }}>Frequent words</Text>
           <Text style={{ fontSize: 14 }}>The most frequent words you used are listed below.</Text>
@@ -78,6 +78,7 @@ export class GraphsScreen extends React.Component {
             <Text style={more}>MORE</Text>
           </TouchableOpacity>
         </Card>
+        <View style={{ height: 8, width: '100%' }}/>
       </ScrollView>
     );
   }
@@ -89,7 +90,7 @@ export class GraphsScreen extends React.Component {
 
   navigateToHappiness() {
     const navParams = {
-      category: "Hapiness",
+      category: "Happiness",
       activities: {
         work: 0.55,
         study: 0.40,
@@ -99,7 +100,6 @@ export class GraphsScreen extends React.Component {
       advices: `According to your ratings, it seems that you should spend more time with sport and family, while decreasing the amount of time spent with activities related work and study. Try to allocate a bit more time for doing exercises, even 30 minutes a day can have a lot of positive outcome.`
     }
     this.props.navigation.navigate('GraphsDetail', navParams)
-    // TODO: make single page and plug it in...
   }
 
   naviateToSocial() {

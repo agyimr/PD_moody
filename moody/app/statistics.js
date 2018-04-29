@@ -108,8 +108,9 @@ export class StatisticsScreen extends React.Component {
 
   render() {
     return (
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1, backgroundColor: GREY, paddingTop: 4 }}>
         {this.renderCards()}
+        <View style={{ height: 8, width: '100%' }}/>
       </ScrollView>
     );
   }

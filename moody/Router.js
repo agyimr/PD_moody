@@ -4,15 +4,15 @@ import { DiaryDetail } from './app/diary_detail';
 import { GraphsScreen } from './app/graphs';
 import { GraphsDetail } from './app/graphs_detail';
 import { StatisticsScreen } from './app/statistics';
-import { StatisticsDetail } from './app/statictics_detail';
-import { PRIMARY } from './app/common/colors';
+import { StatisticsDetail } from './app/statistics_detail';
+import { PRIMARY, WHITE } from './app/common/colors';
 
 const DiaryStack = StackNavigator(
   {
     Diary: { screen: DiaryScreen },
     DiaryDetail: { screen: DiaryDetail },
   },
-  { initialRouteName: 'Diary', headerMode: 'none' }
+  { initialRouteName: 'Diary', headerMode: 'none', cardStyle: { backgroundColor: WHITE } }
 );
 
 const GraphsStack = StackNavigator(
@@ -20,7 +20,7 @@ const GraphsStack = StackNavigator(
     Graphs: { screen: GraphsScreen },
     GraphsDetail: { screen: GraphsDetail },
   },
-  { initialRouteName: 'Graphs', headerMode: 'none' }
+  { initialRouteName: 'Graphs', headerMode: 'none', cardStyle: { backgroundColor: WHITE } }
 );
 
 const StatisticsStack = StackNavigator(
@@ -28,7 +28,7 @@ const StatisticsStack = StackNavigator(
     Statistics: { screen: StatisticsScreen },
     StatisticsDetail: { screen: StatisticsDetail },
   },
-  { initialRouteName: 'Statistics', headerMode: 'none' }
+  { initialRouteName: 'Statistics', headerMode: 'none', cardStyle: { backgroundColor: WHITE } }
 );
 
 const Router = TabNavigator({
