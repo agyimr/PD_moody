@@ -1,14 +1,13 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { Card } from './common/card';
-import { PRIMARY, GREY, BLACK } from './common/colors';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { BarChart, YAxis, XAxis } from 'react-native-svg-charts';
+import { StackNavigator } from 'react-navigation';
 import * as scale from 'd3-scale';
+import { Card } from './common/card';
+import { PRIMARY, GREY, BLACK } from './common/colors';
 
 export class StatisticsScreen extends React.Component {
-
-
 
   renderCards() {
     const data = [
@@ -99,17 +98,29 @@ export class StatisticsScreen extends React.Component {
               />
             </View>
           </View>
+          <TouchableOpacity onPress={() => { this.naviateToStatDetail(cardData.title) }}>
+            <Text style={more}>MORE</Text>
+          </TouchableOpacity>
         </Card>
       )
     });
   }
 
   render() {
-
     return (
       <ScrollView style={{ flex: 1 }}>
         {this.renderCards()}
       </ScrollView>
     );
   }
+
+  naviateToStatDetail(title) {
+    this.props.navigation.navigate('StatisticsDetail', title)
+  }
 }
+
+const more = {
+  color: PRIMARY,
+  fontSize: 17,
+  paddingTop: 5
+};
