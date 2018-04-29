@@ -62,7 +62,7 @@ export class DiaryScreen extends React.Component {
           <Icon name="search" size={30} color={WHITE} />
         </TouchableOpacity>
         <TouchableOpacity 
-          onPress={this.onRateTodayPress} 
+          onPress={() => {this.onRateTodayPress()}} 
           title="Addrate" 
           style={[floating, { right: 20, bottom: 20, backgroundColor: PRIMARY }]}>
           <Icon name="add" size={30} color={WHITE} />
@@ -72,7 +72,7 @@ export class DiaryScreen extends React.Component {
   }
 
   onRateTodayPress() {
-    // TODO: navigate to rating today.
+    this.props.navigation.navigate('DailySummary');
   }
 
   renderHeader(section) {
