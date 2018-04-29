@@ -4,14 +4,14 @@ import { DiaryDetail } from './app/diary_detail';
 import { GraphsScreen } from './app/graphs';
 import { GraphsDetail } from './app/graphs_detail';
 import { StatisticsScreen } from './app/statistics';
-import { PRIMARY } from './app/common/colors';
+import { PRIMARY, WHITE } from './app/common/colors';
 
 const DiaryStack = StackNavigator(
   {
     Diary: { screen: DiaryScreen },
     DiaryDetail: { screen: DiaryDetail },
   },
-  { initialRouteName: 'Diary', headerMode: 'none' }
+  { initialRouteName: 'Diary', headerMode: 'none', cardStyle: { backgroundColor: WHITE } }
 );
 
 const GraphStack = StackNavigator(
@@ -19,7 +19,7 @@ const GraphStack = StackNavigator(
     Graphs: { screen: GraphsScreen },
     GraphsDetail: { screen: GraphsDetail },
   },
-  { initialRouteName: 'Graphs', headerMode: 'none' }
+  { initialRouteName: 'Graphs', headerMode: 'none', cardStyle: { backgroundColor: WHITE } }
 );
 
 const Router = TabNavigator({

@@ -44,6 +44,7 @@ export class GraphsScreen extends React.Component {
     const webviewContent = require('./wordcloud/index.html')
     return (
       <ScrollView style={{ flex: 1 }}>
+      <Text>{`Statistics related to ${undefined}`}</Text>
         <Card>
           <Text style={{ fontWeight: 'bold', fontSize: 40, color: BLACK }}>Frequent words</Text>
           <Text style={{ fontSize: 14 }}>The most frequent words you used are listed below.</Text>

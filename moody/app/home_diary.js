@@ -3,7 +3,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { View, Text, Button, DatePickerAndroid, SectionList, TouchableOpacity } from 'react-native';
 import { ListItem } from './common/listitem';
 import { GREY, WHITE, PRIMARY } from './common/colors';
-import { StackNavigator } from 'react-navigation';
 
 export class DiaryScreen extends React.Component {  
   dummyData = [
