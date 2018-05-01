@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-export class Slide1 extends React.Component {
+export class Slide4 extends React.Component {
 
   render() {
     return (

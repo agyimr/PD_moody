@@ -47,6 +47,7 @@ export class DailySummary extends React.Component {
         buttonWrapperStyle={{ position: 'absolute', top: 270 }}
         nextButton={<Text style={{ fontSize: 20, fontWeight: 'bold', color: PRIMARY }} >NEXT</Text>}
         prevButton={<Text></Text>}
+        scrollEnabled={false}
       >
         <Slide1 />
         <Slide2 />
