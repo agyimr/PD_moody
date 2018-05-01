@@ -4,13 +4,15 @@ import { DiaryDetail } from './app/diary_detail';
 import { GraphsScreen } from './app/graphs';
 import { GraphsDetail } from './app/graphs_detail';
 import { StatisticsScreen } from './app/statistics';
-import { StatisticsDetail } from './app/statistics_detail';
-import { PRIMARY, WHITE } from './app/common/colors';
+import { StatisticsDetail } from './app/statictics_detail';
+import { DailySummary } from './app/questionnaire/daily_summary';
+import { PRIMARY } from './app/common/colors';
 
 const DiaryStack = StackNavigator(
   {
     Diary: { screen: DiaryScreen },
     DiaryDetail: { screen: DiaryDetail },
+    DailySummary: { screen: DailySummary },
   },
   { initialRouteName: 'Diary', headerMode: 'none', cardStyle: { backgroundColor: WHITE } }
 );
