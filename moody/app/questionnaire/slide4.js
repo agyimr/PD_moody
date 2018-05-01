@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { PRIMARY, WHITE } from '../common/colors';
 
 export class Slide4 extends React.Component {
+  question = 'What did you spent time\nwith today?';
+
   constructor(props) {
     super(props);
     this.state = {
@@ -14,9 +16,10 @@ export class Slide4 extends React.Component {
   }
 
   toggleState(key) {
+    this.props.activityChanged(key);
     this.setState({
       [key]: !this.state[key]
-    })
+    });
   }
 
   renderButtons() {
@@ -35,11 +38,15 @@ export class Slide4 extends React.Component {
     return buttons;
   }
 
+  onSubmit = () => {
+    this.props.onSubmit();
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: 20, paddingBottom: 0 }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }} >What did you spent time with today?</Text>
+          <Text style={{ fontSize: 24 }} >{this.question}</Text>
           <Image
             style={{ width: 50, height: 50 }}
             source={require('./logo.png')}
@@ -52,8 +59,8 @@ export class Slide4 extends React.Component {
           {this.renderButtons()}
         </View>
         <View style={{ position: 'absolute', display: 'flex', alignItems: 'flex-end', bottom: 20, right: 10 }} >
-          <TouchableOpacity>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', color: PRIMARY}} >READY</Text>
+          <TouchableOpacity onPress={this.onSubmit}>
+            <Text style={{ fontSize: 20, color: PRIMARY, marginRight: 10}} >READY</Text>
           </TouchableOpacity>
         </View>
       </View>
