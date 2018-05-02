@@ -3,21 +3,23 @@ import { View, Text, Image } from 'react-native';
 import { CircularSlider } from './circular_slider';
 
 export class Slide2 extends React.Component {
+  question = 'What was your mood like\ntoday?'
+
   constructor(props) {
     super(props);
-    this.state = { slider: '' };
+    this.state = { range: 0, angle: 0 };
   }
 
-  onValueChange(value) {
-    // console.log(value)
-    this.setState({ slider: value })
+  onValueChange({ range, angle }) {
+    this.props.moodChanged({ range, angle });
+    this.setState({ range, angle });
   }
 
   render() {
     return (
       <View>
         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: 20, paddingBottom: 0 }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }} >How do you feel about your day?</Text>
+          <Text style={{ fontSize: 24 }} >{this.question}</Text>
           <Image
             style={{ width: 50, height: 50 }}
             source={require('./logo.png')}
