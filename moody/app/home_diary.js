@@ -1,10 +1,14 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { View, Text, Button, DatePickerAndroid, SectionList, TouchableOpacity } from 'react-native';
+import { View, Text, Button, DatePickerAndroid, SectionList, TouchableOpacity, AsyncStorage } from 'react-native';
 import { ListItem } from './common/listitem';
 import { GREY, WHITE, PRIMARY } from './common/colors';
 
-export class DiaryScreen extends React.Component {  
+export class DiaryScreen extends React.Component {
+  displayMessage = "You haven't rated so far.";
+  state = { showMessage: true };
+  key = 0;
+
   dummyData = [
     { title: new Date(2018, 4, 1), key: "0", data: [
       {title: "Title1", description: "Description1", mood: "relaxed", rating: "3", activity: "work", key: "0"},
@@ -24,6 +28,67 @@ export class DiaryScreen extends React.Component {
       {title: "Title8", description: "Description8", mood: "relaxed", rating: "3", activity: "work", key: "11"}]
     }
   ]
+
+  formatData(database) {
+    this.data = [];
+    database.forEach(item => {
+      const date = new Date(item.date);
+      const itemDate = new Date(date.getFullYear(), date.getMonth(), 1);
+      const index = this.data.findIndex(d => d.title.valueOf() === itemDate.valueOf());
+      const newEntry = { 
+        title: `${this.getDate(date)}, ${this.getWeekDay(date)}`,
+        description: item.text,
+        key: this.key,
+      }
+      this.key += 1;
+      if (index !== -1) { this.data[index].data.push(newEntry) }
+      else {
+        const divider = this.createDivider(itemDate);
+        divider.data.push(newEntry);
+        this.data.push(divider)
+      }
+    });
+  }
+
+  getWeekDay(date) {
+    const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    return weekdays[date.getDay()];
+  }
+
+  getDate(date) {
+    switch (date.getDate()) {
+      case 1:
+          return `1st`;
+      case 2:
+          return `2nd`;
+      case 3:
+          return `3rd`;
+      default:
+        return `${date.getDate()}th`;
+    }
+  }
+
+  createDivider(date) {
+    const divider = { title: date, key: this.key, data: [] };
+    this.key += 1;
+    return divider;
+  }
+
+
+  async componentWillMount() {
+    const database_string = await AsyncStorage.getItem("db");
+    if (!database_string) return;
+
+    const database = JSON.parse(database_string);
+
+    if (database !== []) {
+      console.log(database);
+      this.formatData(database);
+      this.setState({ showMessage: false });
+    } else {
+      this.setState({ showMessage: true });
+    }
+  }
 
   async pickDate() {
     try {
@@ -45,16 +110,26 @@ export class DiaryScreen extends React.Component {
     />
   }
 
+  renderMessage() {
+    return <Text style={{ padding: 15, fontSize: 15, fontStyle: "italic" }}>{this.displayMessage}</Text>;
+  }
+
+  renderList() {
+    return <SectionList
+      style={{ paddingLeft: 15, paddingRight: 15 }}
+      sections={this.data}
+      renderSectionHeader={({section}) => this.renderHeader(section)}
+      stickySectionHeadersEnabled={true}
+      renderItem={({item}) => this.renderListItem(item)}
+    />
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <SectionList
-          style={{ paddingLeft: 15, paddingRight: 15 }}
-          sections={this.dummyData}
-          renderSectionHeader={({section}) => this.renderHeader(section)}
-          stickySectionHeadersEnabled={true}
-          renderItem={({item}) => this.renderListItem(item)}
-        />
+        {this.state.showMessage ? this.renderMessage() : this.renderList()}
+
+        
         <TouchableOpacity onPress={this.pickDate} 
           title="Search"
           style={[floating, { right: 20, bottom: 110, backgroundColor: PRIMARY } ]}>
