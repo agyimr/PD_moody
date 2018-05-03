@@ -9,14 +9,14 @@ export class CustomLineChart extends React.PureComponent {
 
     formatDate(d) {
         const date = new Date(d);
-        const months = ["Jan", "Febr", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+        const months = ["Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec", "Jan"];
         return `${months[date.getMonth()]}`;
     }
 
     render() {
         const axesSvg = { fontSize: 14, fill: 'grey' };
         const verticalContentInset = { top: 10, bottom: 10 };
-        const xAxisHeight = 10;
+        const xAxisHeight = 15;
 
         return (
             <View style={{ height: 200, flexDirection: 'row', paddingTop: 10, paddingBottom: 10 }}>
@@ -25,6 +25,7 @@ export class CustomLineChart extends React.PureComponent {
                   yAccessor={({item}) => item.value}
                   style={{ marginBottom: xAxisHeight }}
                   contentInset={verticalContentInset}
+                  numberOfTicks={ 5 }
                   svg={axesSvg}
               />
               <View style={{ flex: 1, marginLeft: 10 }}>
@@ -41,8 +42,8 @@ export class CustomLineChart extends React.PureComponent {
                 <XAxis
                     style={{ marginHorizontal: -10, height: xAxisHeight }}
                     data={this.props.data}
-                    // xAccessor={({item}) => item.date}
-                    formatLabel={(value, index) => (index % 15 === 7 ? this.formatDate(value) : "")}
+                    xAccessor={({item}) => item.date}
+                    formatLabel={(value, index) => (index % 30 === 7 ? this.formatDate(value) : "")}
                     contentInset={{ left: 10, right: 10 }}
                     svg={axesSvg}
                 />

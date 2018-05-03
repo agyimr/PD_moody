@@ -9,28 +9,8 @@ export class DiaryScreen extends React.Component {
   state = { showMessage: true, displayData: [] };
   key = 0;
 
-  dummyData = [
-    { title: new Date(2018, 4, 1), key: "0", data: [
-      {title: "Title1", description: "Description1", mood: "relaxed", rating: "3", activity: "work", key: "0"},
-      {title: "Title2", description: "Description2", mood: "relaxed", rating: "2", activity: "study", key: "1"},
-      {title: "Title3", description: "Description3", mood: "relaxed", rating: "4", activity: "sport", key: "2"}]
-    },
-    { title: new Date(2018, 5, 1), key: "1", data: [
-      {title: "Title1", description: "Description1", mood: "relaxed", rating: "5", activity: "study", key: "4"},
-      {title: "Title2", description: "Description2", mood: "relaxed", rating: "2", activity: "work", key: "5"},
-      {title: "Title3", description: "Description3", mood: "relaxed", rating: "3", activity: "sport", key: "6"},
-      {title: "Title4", description: "Description4", mood: "relaxed", rating: "3", activity: "work", key: "7"}]
-    },
-    { title: new Date(2018, 6, 1), key: "2", data: [
-      {title: "Title5", description: "Description5", mood: "relaxed", rating: "5", activity: "work", key: "8"},
-      {title: "Title6", description: "Description6", mood: "relaxed", rating: "2", activity: "study", key: "9"},
-      {title: "Title7", description: "Description7", mood: "relaxed", rating: "3", activity: "work", key: "10"},
-      {title: "Title8", description: "Description8", mood: "relaxed", rating: "3", activity: "work", key: "11"}]
-    }
-  ]
-
   formatData(database) {
-    const data = [];
+    let data = [];
     database.forEach(item => {
       const date = new Date(item.date);
       const itemDate = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -51,7 +31,8 @@ export class DiaryScreen extends React.Component {
         data.push(divider)
       }
     });
-    return data;
+    data.forEach(d => { d.data = d.data.reverse() });
+    return data.reverse();
   }
 
   getActivity(item) {
