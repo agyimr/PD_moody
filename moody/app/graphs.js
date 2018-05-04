@@ -169,30 +169,70 @@ export class GraphsScreen extends React.Component {
     this.webViewRef.postMessage(JSON.stringify(res));
   }
 
-  navigateToHappiness() {
+  async navigateToHappiness() {
+    const db_string = await AsyncStorage.getItem("db");
+    if (!db_string) return;
+
+    const db = JSON.parse(db_string);
+
+    const scores =[ 
+      {activity: "work", score: this.getAverageHappiness(db.filter(d => d.work))},
+      {activity: "study", score: this.getAverageHappiness(db.filter(d => d.study))},
+      {activity: "family", score: this.getAverageHappiness(db.filter(d => d.family))},
+      {activity: "sport", score: this.getAverageHappiness(db.filter(d => d.sport))}
+    ];
+
+    scores.sort((a, b)  => b.score - a.score);
+
     const navParams = {
       category: "Happiness",
       activities: {
-        work: 0.55,
-        study: 0.40,
-        family: 0.90,
-        sport: 0.74
+        work: this.getAverageHappiness(db.filter(d => d.work)),
+        study: this.getAverageHappiness(db.filter(d => d.study)),
+        family: this.getAverageHappiness(db.filter(d => d.family)),
+        sport: this.getAverageHappiness(db.filter(d => d.sport))
       },
-      advices: `According to your ratings, it seems that you should spend more time with sport and family, while decreasing the amount of time spent with activities related work and study. Try to allocate a bit more time for doing exercises, even 30 minutes a day can have a lot of positive outcome.`
+      advices: `According to your ratings, it seems that you should spend more time with ${scores[0].activity} and ${scores[1].activity}, while decreasing the amount of time spent with activities related ${scores[2].activity} and ${scores[3].activity} in order to achieve a happier life.`
     }
+
+
     this.props.navigation.navigate('GraphsDetail', navParams)
   }
 
-  naviateToSocial() {
+  getAverageHappiness(data) {
+    const h = data.map(d => ((d.angle * d.range) + 18000) / 36000);
+    return h.reduce((acc, cur) => acc + cur, 0)/h.length;
+  }
+
+  getAverageSocialRate(data) {
+    const s = data.map(d => d.social_rate / 5);
+    return s.reduce((acc, cur) => acc + cur, 0)/s.length;
+
+  }
+  
+  async naviateToSocial() {
+    const db_string = await AsyncStorage.getItem("db");
+    if (!db_string) return;
+
+    const db = JSON.parse(db_string);
+
+    const scores =[ 
+      {activity: "work", score: this.getAverageSocialRate(db.filter(d => d.work))},
+      {activity: "study", score: this.getAverageSocialRate(db.filter(d => d.study))},
+      {activity: "family", score: this.getAverageSocialRate(db.filter(d => d.family))},
+      {activity: "sport", score: this.getAverageSocialRate(db.filter(d => d.sport))}
+    ];
+    scores.sort((a, b)  => b.score - a.score);
+
     const navParams = {
       category: "Social Life",
       activities: {
-        work: 0.2,
-        study: 0.70,
-        family: 0.90,
-        sport: 0.34
+        work: this.getAverageSocialRate(db.filter(d => d.work)),
+        study: this.getAverageSocialRate(db.filter(d => d.study)),
+        family: this.getAverageSocialRate(db.filter(d => d.family)),
+        sport: this.getAverageSocialRate(db.filter(d => d.sport))
       },
-      advices: `ASDASDasdasd`
+      advices: `According to your ratings, it seems that you should spend more time with ${scores[0].activity} and ${scores[1].activity}, while decreasing the amount of time spent with activities related ${scores[2].activity} and ${scores[3].activity} to live a more social life.`
     }
     this.props.navigation.navigate('GraphsDetail', navParams)
   }

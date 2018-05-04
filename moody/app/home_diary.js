@@ -130,6 +130,8 @@ export class DiaryScreen extends React.Component {
     />
   }
 
+
+
   render() {
     return (
       <View style={{ flex: 1 }}>
