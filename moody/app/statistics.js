@@ -44,7 +44,6 @@ export class StatisticsScreen extends React.Component {
 
     return this.stats.map((cardData, index) => {
       chartNumbers = this.state.data[index]
-      subDB = this.state.categorical_db[index]
       return (
         <Card key={cardData.title}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -80,7 +79,7 @@ export class StatisticsScreen extends React.Component {
               />
             </View>
           </View>
-          <TouchableOpacity onPress={() => { this.naviateToStatDetail(cardData.title, subDB) }}>
+          <TouchableOpacity onPress={() => { this.navigateToStatDetail(cardData.title) }}>
             <Text style={more}>MORE</Text>
           </TouchableOpacity>
         </Card>
@@ -109,10 +108,7 @@ export class StatisticsScreen extends React.Component {
         { label: 'social life', value: avg_social_rate }
       ];
     });
-    console.log('Categorical DB: ', categorical_db);
-    
-    console.log('Graph DB: ', data_to_display);
-    return { data_to_display, categorical_db }
+    return data_to_display
   }
 
   async componentWillMount() {
@@ -123,8 +119,8 @@ export class StatisticsScreen extends React.Component {
 
     if (database !== []) {
       // console.log(database);
-      const { data_to_display, categorical_db } = this.convertData(database);
-      this.setState({ showMessage: false, data: data_to_display, categorical_db: categorical_db });
+      const data_to_display = this.convertData(database);
+      this.setState({ showMessage: false, data: data_to_display});
     } else {
       // handle empty array
     }
@@ -139,9 +135,8 @@ export class StatisticsScreen extends React.Component {
     );
   }
 
-  naviateToStatDetail(title, subDB) {
-    console.log(title, subDB)
-    this.props.navigation.navigate('StatisticsDetail', {title:title, subDB: subDB })
+  navigateToStatDetail(title) {
+    this.props.navigation.navigate('StatisticsDetail', title)
   }
 }
 

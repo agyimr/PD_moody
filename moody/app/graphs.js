@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, WebView, AsyncStorage } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, WebView, AsyncStorage } from 'react-native';
 import { Card } from './common/card';
 import { CustomLineChart } from './common/linechart';
 import { BLACK, LIGHT_PRIMARY, GREY, PRIMARY } from './common/colors';
