@@ -6,52 +6,52 @@ import { GREY, WHITE, PRIMARY } from './common/colors';
 
 export class DiaryScreen extends React.Component {
   displayMessage = "You haven't rated so far.";
-  state = { showMessage: true };
+  state = { showMessage: true, displayData: [] };
   key = 0;
 
-  dummyData = [
-    { title: new Date(2018, 4, 1), key: "0", data: [
-      {title: "Title1", description: "Description1", mood: "relaxed", rating: "3", activity: "work", key: "0"},
-      {title: "Title2", description: "Description2", mood: "relaxed", rating: "2", activity: "study", key: "1"},
-      {title: "Title3", description: "Description3", mood: "relaxed", rating: "4", activity: "sport", key: "2"}]
-    },
-    { title: new Date(2018, 5, 1), key: "1", data: [
-      {title: "Title1", description: "Description1", mood: "relaxed", rating: "5", activity: "study", key: "4"},
-      {title: "Title2", description: "Description2", mood: "relaxed", rating: "2", activity: "work", key: "5"},
-      {title: "Title3", description: "Description3", mood: "relaxed", rating: "3", activity: "sport", key: "6"},
-      {title: "Title4", description: "Description4", mood: "relaxed", rating: "3", activity: "work", key: "7"}]
-    },
-    { title: new Date(2018, 6, 1), key: "2", data: [
-      {title: "Title5", description: "Description5", mood: "relaxed", rating: "5", activity: "work", key: "8"},
-      {title: "Title6", description: "Description6", mood: "relaxed", rating: "2", activity: "study", key: "9"},
-      {title: "Title7", description: "Description7", mood: "relaxed", rating: "3", activity: "work", key: "10"},
-      {title: "Title8", description: "Description8", mood: "relaxed", rating: "3", activity: "work", key: "11"}]
-    }
-  ]
-
   formatData(database) {
-    this.data = [];
+    let data = [];
     database.forEach(item => {
       const date = new Date(item.date);
       const itemDate = new Date(date.getFullYear(), date.getMonth(), 1);
-      const index = this.data.findIndex(d => d.title.valueOf() === itemDate.valueOf());
+      const index = data.findIndex(d => d.title.valueOf() === itemDate.valueOf());
       const newEntry = { 
         title: `${this.getDate(date)}, ${this.getWeekDay(date)}`,
         description: item.text,
+        mood: this.getMood(item),
+        rating: item.social_rate,
+        activity: this.getActivity(item),
         key: this.key,
       }
       this.key += 1;
-      if (index !== -1) { this.data[index].data.push(newEntry) }
+      if (index !== -1) { data[index].data.push(newEntry) }
       else {
         const divider = this.createDivider(itemDate);
         divider.data.push(newEntry);
-        this.data.push(divider)
+        data.push(divider)
       }
     });
+    data.forEach(d => { d.data = d.data.reverse() });
+    return data.reverse();
+  }
+
+  getActivity(item) {
+    let activities = [];
+    if (item.work) activities.push("work");
+    if (item.study) activities.push("study");
+    if (item.family) activities.push("family");
+    if (item.sport) activities.push("sport");
+    return activities.join(", ");
+  }
+
+  getMood({ range, angle }) {
+    const score = range * angle;
+    const moods = ["irritated", "tense", "bored", "sad", "calm", "relaxed", "cheerful", "excited"];
+    return moods[Math.floor((score + 18000) / 4500)]
   }
 
   getWeekDay(date) {
-    const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     return weekdays[date.getDay()];
   }
 
@@ -82,11 +82,10 @@ export class DiaryScreen extends React.Component {
     const database = JSON.parse(database_string);
 
     if (database !== []) {
-      console.log(database);
-      this.formatData(database);
-      this.setState({ showMessage: false });
+      this.data = this.formatData(database);
+      this.setState({ showMessage: false, displayData: this.data });
     } else {
-      this.setState({ showMessage: true });
+      this.setState({ showMessage: true, displayData: [] });
     }
   }
 
@@ -94,9 +93,16 @@ export class DiaryScreen extends React.Component {
     try {
       const {action, year, month, day} = await DatePickerAndroid.open({ date: new Date() });
       if (action !== DatePickerAndroid.dismissedAction) {
-        this.filter = { date: new Date(year, month, day) };
+        const filterDate = new Date(year, month, day);
+        const displayData = this.data.filter(d => d.title.valueOf() < filterDate.valueOf() && (d.title.valueOf() + 2592000000) > filterDate.valueOf());
+        this.setState({ displayData });
+      } else {
+        const displayData = this.data;
+        this.setState({ displayData });
       }
     } catch ({code, message}) {
+      const displayData = this.data;
+      this.setState({ displayData });
       console.warn('Cannot open date picker', message);
     }
   }
@@ -117,7 +123,7 @@ export class DiaryScreen extends React.Component {
   renderList() {
     return <SectionList
       style={{ paddingLeft: 15, paddingRight: 15 }}
-      sections={this.data}
+      sections={this.state.displayData}
       renderSectionHeader={({section}) => this.renderHeader(section)}
       stickySectionHeadersEnabled={true}
       renderItem={({item}) => this.renderListItem(item)}
@@ -130,7 +136,7 @@ export class DiaryScreen extends React.Component {
         {this.state.showMessage ? this.renderMessage() : this.renderList()}
 
         
-        <TouchableOpacity onPress={this.pickDate} 
+        <TouchableOpacity onPress={this.pickDate.bind(this)} 
           title="Search"
           style={[floating, { right: 20, bottom: 110, backgroundColor: PRIMARY } ]}>
           <Icon name="search" size={30} color={WHITE} />
@@ -158,7 +164,7 @@ export class DiaryScreen extends React.Component {
   }
 
   getHeader(date) {
-    const months = ["Jan", "Febr", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
     return `${months[date.getMonth()]} ${date.getFullYear()}`;
   }
 }
