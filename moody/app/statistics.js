@@ -8,6 +8,7 @@ import { Card } from './common/card';
 import { PRIMARY, GREY, BLACK } from './common/colors';
 
 export class StatisticsScreen extends React.Component {
+  state = { showMessage: true, data: [], categorical_db: [] };
   stats = [
     {
       title: 'Work',
@@ -31,39 +32,19 @@ export class StatisticsScreen extends React.Component {
     }
   ];
 
+  renderMessage() {
+    return <Text style={{ padding: 15, fontSize: 15, fontStyle: "italic" }}>{this.displayMessage}</Text>;
+  }
+
   renderCards() {
-    const data = [
-      [
-        { label: 'happiness', value: 100 },
-        { label: 'sentiment', value: 10 },
-        { label: 'social life', value: 10 }
-      ],
-      [
-        { label: 'happiness', value: 10 },
-        { label: 'sentiment', value: 100 },
-        { label: 'social life', value: 10 }
-      ],
-      [
-        { label: 'happiness', value: 100 },
-        { label: 'sentiment', value: 100 },
-        { label: 'social life', value: 100 }
-      ],
-      [
-        { label: 'happiness', value: 50 },
-        { label: 'sentiment', value: 10 },
-        { label: 'social life', value: 50 }
-      ]
-    ];
-
-    
-
     const axesSvg = { fontSize: 14, fill: 'grey' };
     const verticalContentInset = { top: 10, bottom: 10 };
     const xAxisHeight = 10;
     const fill = PRIMARY;
 
     return this.stats.map((cardData, index) => {
-      chartNumbers = data[index]
+      chartNumbers = this.state.data[index]
+      subDB = this.state.categorical_db[index]
       return (
         <Card key={cardData.title}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -99,7 +80,7 @@ export class StatisticsScreen extends React.Component {
               />
             </View>
           </View>
-          <TouchableOpacity onPress={() => { this.naviateToStatDetail(cardData.title) }}>
+          <TouchableOpacity onPress={() => { this.naviateToStatDetail(cardData.title, subDB) }}>
             <Text style={more}>MORE</Text>
           </TouchableOpacity>
         </Card>
@@ -117,7 +98,7 @@ export class StatisticsScreen extends React.Component {
       sum_happiness = category.reduce((sum,value) => {
         return sum + (value.angle * value.range);
       }, 0)
-      avg_happiness = sum_happiness / category.length / 180 //to have a scale between 0-100
+      avg_happiness = (sum_happiness / category.length / 180) + 50 //to have a scale between 0-100
       sum_social_rate = category.reduce((sum,value) => {
         return sum + value.social_rate;
       }, 0)
@@ -129,7 +110,9 @@ export class StatisticsScreen extends React.Component {
       ];
     });
     console.log('Categorical DB: ', categorical_db);
+    
     console.log('Graph DB: ', data_to_display);
+    return { data_to_display, categorical_db }
   }
 
   async componentWillMount() {
@@ -140,7 +123,8 @@ export class StatisticsScreen extends React.Component {
 
     if (database !== []) {
       // console.log(database);
-      this.convertData(database);
+      const { data_to_display, categorical_db } = this.convertData(database);
+      this.setState({ showMessage: false, data: data_to_display, categorical_db: categorical_db });
     } else {
       // handle empty array
     }
@@ -149,14 +133,15 @@ export class StatisticsScreen extends React.Component {
   render() {
     return (
       <ScrollView style={{ flex: 1, backgroundColor: GREY, paddingTop: 4 }}>
-        {this.renderCards()}
+        {this.state.showMessage ? this.renderMessage() : this.renderCards()}
         <View style={{ height: 8, width: '100%' }}/>
       </ScrollView>
     );
   }
 
-  naviateToStatDetail(title) {
-    this.props.navigation.navigate('StatisticsDetail', title)
+  naviateToStatDetail(title, subDB) {
+    console.log(title, subDB)
+    this.props.navigation.navigate('StatisticsDetail', {title:title, subDB: subDB })
   }
 }
 

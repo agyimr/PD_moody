@@ -1,25 +1,81 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, WebView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, WebView, AsyncStorage } from 'react-native';
 import { Card } from './common/card';
 import { CustomLineChart } from './common/linechart';
 import { BLACK, LIGHT_PRIMARY, GREY, PRIMARY } from './common/colors';
 import { StackNavigator } from 'react-navigation';
-const data = require("./graph_sample.json");
+import * as stopword from 'stopword';
 
 export class StatisticsDetail extends React.Component {
-  state = { sIndex: 2, hIndex: 2 };
-  list_data = [["Web Technologies", 26],["HTML", 20],["<canvas>", 20],["CSS", 15],["JavaScript", 15],["Document Object Model", 12],["<audio>", 12],["<video>", 12],["Web Workers", 12],["XMLHttpRequest", 12],["SVG", 12],["JSON.parse()", 9 ],["Geolocation", 9 ],["data attribute", 9 ],["transform", 9 ],["transition", 9 ],["animation", 9 ],["setTimeout", 7 ],["@font-face", 7 ],["Typed Arrays", 7 ],["FileReader API", 7 ],["FormData", 7 ],["IndexedDB", 7 ],["getUserMedia()", 7 ],["postMassage()", 7 ],["CORS", 7 ],["strict mode", 6 ],["calc()", 6 ],["supports()", 6 ],["media queries", 6 ],["full screen", 6 ],["notification", 6 ],["orientation", 6 ],["requestAnimationFrame", 6 ],["border-radius", 5 ],["box-sizing", 5 ],["rgba()", 5 ],["text-shadow", 5 ],["box-shadow", 5 ],["flexbox", 5 ],["viewpoint", 5 ]];
+  ONE_AND_A_HALF_YEAR = 44578800000;
+  ONE_DAY = 86400000;
+  webview_loaded = false;
+  allSData = [];
+  allHData = [];
+  state = { sIndex: 2, hIndex: 2, sData: this.createPlaceHolders(), hData: this.createPlaceHolders() };
 
-  getData() {
-    // TODO: get data from asyncstorage, and if it's zero, we fill it with 0s.
-    // sIndex: felevek
+  createPlaceHolders() {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const holders = [];
+    const init_date = new Date(today.valueOf() - this.ONE_AND_A_HALF_YEAR);
+    let date = init_date;
+
+    while (today.valueOf() >= date.valueOf()) {
+      holders.push({ date, value: 0 });
+      date = new Date(date.valueOf() + this.ONE_DAY);
+    }
+    return holders;
+  }
+
+  prepareData({ title, subDB }) {
+    const hPlaceHolders = this.state.hData;
+    const sPlaceHolders = this.state.sData;
+
+    if (!subDB) return;
+    console.log(subDB)
+
+    subDB.forEach(item => {
+      const date = new Date(item.date);
+
+      if (date.valueOf() >= hPlaceHolders[0].date.valueOf()) {
+        const diff = date.valueOf() - hPlaceHolders[0].date.valueOf();
+        const index = Math.floor(diff / this.ONE_DAY); // in theory it's always integer
+        hPlaceHolders[index].value = this.getMood(item);
+        sPlaceHolders[index].value = item.social_rate;
+      }
+    });
+    this.allHData = hPlaceHolders;
+    this.allSData = sPlaceHolders;
+    this.setState({
+      title: title,
+      hData: this.getData(this.allHData, this.state.hIndex),
+      sData: this.getData(this.allSData, this.state.sIndex)
+    });
+  }
+
+  getData(data, circle_state) {
+    return data.slice(circle_state * 172, (circle_state + 1) * 172);
+  }
+
+  getMood({ range, angle }) {
+    const score = range * angle;
+    return (score + 18000) / 360;
   }
 
   setPaginationState(type, newVal) {
-    this.setState({
-      sIndex: type === "social" ? newVal : this.state.sIndex,
-      hIndex: type === "happy" ? newVal : this.state.hIndex,
-    });
+    if (type === "social") {
+      this.setState({
+        sIndex: newVal,
+        sData: this.getData(this.allSData, newVal)
+      })
+    } else {
+      this.setState({
+        hIndex: newVal,
+        hData: this.getData(this.allHData, newVal)
+      })
+    }
   }
 
   setBackgroundColor(type, i) {
@@ -41,77 +97,73 @@ export class StatisticsDetail extends React.Component {
   }
 
   render() {
-    const title = this.props.navigation.state.params.toLowerCase();
+    this.prepareData(this.props.navigation.state.params);
 
     const webviewContent = require('./wordcloud/index.html')
     return (
       <ScrollView style={{ flex: 1, backgroundColor: GREY, paddingTop: 4 }}>
-      <Text style={{ fontSize: 14, color: PRIMARY, fontStyle: 'italic', padding: 8 }}>{`Statistics related to ${title}`}</Text>
+        <Text style={{ fontSize: 14, color: PRIMARY, fontStyle: 'italic', padding: 8 }}>{`Statistics related to ${this.state.title}`}</Text>
         <Card>
           <Text style={{ fontWeight: 'bold', fontSize: 40, color: BLACK }}>Frequent words</Text>
-          <Text style={{ fontSize: 14 }}>{`The most frequent words you used when you spent time with ${title}`}</Text>
-          <View style={{width: "100%", height: 215}} pointerEvents="none">
-            <WebView 
+          <Text style={{ fontSize: 14 }}>{`The most frequent words you used when you spent time with ${this.state.title}`}</Text>
+          <View style={{ width: "100%", height: 215 }} pointerEvents="none">
+            <WebView
               scalesPageToFit={true}
               scrollEnabled={false}
               onLoad={this.onWebViewLoad}
-              ref={webview => {this.webViewRef = webview;}}
-              source={webviewContent}  />
+              ref={webview => { this.webViewRef = webview; }}
+              source={webviewContent} />
           </View>
         </Card>
         <Card>
           <Text style={{ fontWeight: 'bold', fontSize: 40, color: BLACK }}>Happiness</Text>
-          <Text style={{ fontSize: 14 }}>{`Your happiness scores related to ${title}`}</Text>
-          <CustomLineChart data={data} />
+          <Text style={{ fontSize: 14 }}>{`Your happiness scores related to ${this.state.title}`}</Text>
+          <CustomLineChart data={this.state.hData} />
           <View style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
             {this.renderCircles("happy")}
           </View>
         </Card>
         <Card>
           <Text style={{ fontWeight: 'bold', fontSize: 40, color: BLACK }}>Social life</Text>
-          <Text style={{ fontSize: 14 }}>{`Your social scores related to ${title}`}</Text>
-          <CustomLineChart data={data} />
+          <Text style={{ fontSize: 14 }}>{`Your social scores related to ${this.state.title}`}</Text>
+          <CustomLineChart data={this.state.sData} />
           <View style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
             {this.renderCircles("social")}
           </View>
         </Card>
-        <View style={{ height: 8, width: '100%' }}/>
+        <View style={{ height: 8, width: '100%' }} />
       </ScrollView>
     );
   }
 
   // WORDCLOUD
-  onWebViewLoad = () => {
-    this.webViewRef.postMessage(JSON.stringify(this.list_data));
-  }
+  onWebViewLoad = async () => {
+    const db_string = await AsyncStorage.getItem("db");
+    if (!db_string) return;
 
-  navigateToHappiness() {
-    const navParams = {
-      category: "Hapiness",
-      activities: {
-        work: 0.55,
-        study: 0.40,
-        family: 0.90,
-        sport: 0.74
-      },
-      advices: `According to your ratings, it seems that you should spend more time with sport and family, while decreasing the amount of time spent with activities related work and study. Try to allocate a bit more time for doing exercises, even 30 minutes a day can have a lot of positive outcome.`
-    }
-    this.props.navigation.navigate('GraphsDetail', navParams)
-    // TODO: make single page and plug it in...
-  }
+    const db = JSON.parse(db_string);
 
-  naviateToSocial() {
-    const navParams = {
-      category: "Social Life",
-      activities: {
-        work: 0.2,
-        study: 0.70,
-        family: 0.90,
-        sport: 0.34
-      },
-      advices: `ASDASDasdasd`
+    const text = db
+      .map(item => item.text)
+      .reduce((acc, curr) => `${acc} ${curr}`, "");
+
+    const array_of_words = stopword.removeStopwords(text.split(' '));
+    counter = {};
+
+    array_of_words.forEach(word => {
+      counter[word] = (counter[word] || 0) + 1;
+    });
+
+    results = [];
+    for (let key in counter) {
+      results.push([key, counter[key]]);
     }
-    this.props.navigation.navigate('GraphsDetail', navParams)
+
+    results.sort((a, b) => (b[1] - a[1]));
+    const max = results[0][1];
+    console.log(max);
+    const res = results.map(a => [a[0], (a[1] * (25 / max))]).slice(0, 50);
+    this.webViewRef.postMessage(JSON.stringify(res));
   }
 }
 
