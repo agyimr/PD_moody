@@ -115,6 +115,22 @@ export class StatisticsScreen extends React.Component {
     );
   }
 
+  refresh() {
+    this.forceUpdate();
+  }
+
+  componentDidMount() {
+    this.subs = [
+      this.props.navigation.addListener('willFocus', this.refresh.bind(this) ),
+    ];
+  }
+
+  componentWillUnmount() {
+    this.subs.forEach((sub) => {
+      sub.remove();
+    });
+  }
+
   naviateToStatDetail(title) {
     this.props.navigation.navigate('StatisticsDetail', title)
   }

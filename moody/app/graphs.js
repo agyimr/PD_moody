@@ -30,6 +30,22 @@ export class GraphsScreen extends React.Component {
     return holders;
   }
 
+  refresh() {
+    this.forceUpdate();
+  }
+
+  componentDidMount() {
+    this.subs = [
+      this.props.navigation.addListener('willFocus', this.refresh.bind(this) ),
+    ];
+  }
+
+  componentWillUnmount() {
+    this.subs.forEach((sub) => {
+      sub.remove();
+    });
+  }
+
   async componentWillMount() {
     const hPlaceHolders = this.state.hData;
     const sPlaceHolders = this.state.sData;
