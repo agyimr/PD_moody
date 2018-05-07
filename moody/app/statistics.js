@@ -109,7 +109,6 @@ export class StatisticsScreen extends React.Component {
         .map(c => c.text)
         .join(' ')).comparative * 100;
 
-      console.log(avg_sentiment);
       return [
         { label: 'happiness', value: avg_happiness },
         { label: 'sentiment', value: avg_sentiment },

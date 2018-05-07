@@ -165,7 +165,6 @@ export class StatisticsDetail extends React.Component {
 
     results.sort((a, b) => (b[1] - a[1]));
     const max = results[0][1];
-    console.log(max);
     const res = results.map(a => [a[0], (a[1] * (25 / max))]).slice(0, 50);
     this.webViewRef.postMessage(JSON.stringify(res));
   }
