@@ -6,6 +6,7 @@ import { StackNavigator } from 'react-navigation';
 import * as scale from 'd3-scale';
 import { Card } from './common/card';
 import { PRIMARY, GREY, BLACK } from './common/colors';
+import Sentiment from 'sentiment';
 
 export class StatisticsScreen extends React.Component {
   state = { showMessage: true, data: [], categorical_db: [] };
@@ -88,6 +89,7 @@ export class StatisticsScreen extends React.Component {
   }
 
   convertData(db) {
+    const sentiment = new Sentiment();
     categorical_db = this.stats.map((category) => {
       filtered_db = db.filter((element) => element[category.title.toLowerCase()])
       return filtered_db
@@ -102,9 +104,15 @@ export class StatisticsScreen extends React.Component {
         return sum + value.social_rate;
       }, 0)
       avg_social_rate = sum_social_rate / category.length / 5 * 100
+
+      avg_sentiment = sentiment.analyze(category
+        .map(c => c.text)
+        .join(' ')).comparative * 100;
+
+      console.log(avg_sentiment);
       return [
         { label: 'happiness', value: avg_happiness },
-        { label: 'sentiment', value: 0 },
+        { label: 'sentiment', value: avg_sentiment },
         { label: 'social life', value: avg_social_rate }
       ];
     });
@@ -151,7 +159,7 @@ export class StatisticsScreen extends React.Component {
     });
   }
 
-  naviateToStatDetail(title) {
+  navigateToStatDetail(title) {
     this.props.navigation.navigate('StatisticsDetail', title)
   }
 }
