@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, AsyncStorage } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { BarChart, YAxis, XAxis } from 'react-native-svg-charts';
 import { StackNavigator } from 'react-navigation';
@@ -8,61 +8,42 @@ import { Card } from './common/card';
 import { PRIMARY, GREY, BLACK } from './common/colors';
 
 export class StatisticsScreen extends React.Component {
+  state = { showMessage: true, data: [], categorical_db: [] };
+  stats = [
+    {
+      title: 'Work',
+      icon: 'business-center',
+      note: 'You seem to enjoy working, keep on!'
+    },
+    {
+      title: 'Study',
+      icon: 'school',
+      note: 'You should consider changing edu-line.'
+    },
+    {
+      title: 'Family',
+      icon: 'people',
+      note: 'Spend more time with your family'
+    },
+    {
+      title: 'Sport',
+      icon: 'directions-bike',
+      note: 'You feel comfortable doing sport, that\'s cool!'
+    }
+  ];
+
+  renderMessage() {
+    return <Text style={{ padding: 15, fontSize: 15, fontStyle: "italic" }}>{this.displayMessage}</Text>;
+  }
 
   renderCards() {
-    const data = [
-      [
-        { label: 'happiness', value: 100 },
-        { label: 'sentiment', value: 10 },
-        { label: 'social life', value: 10 }
-      ],
-      [
-        { label: 'happiness', value: 10 },
-        { label: 'sentiment', value: 100 },
-        { label: 'social life', value: 10 }
-      ],
-      [
-        { label: 'happiness', value: 100 },
-        { label: 'sentiment', value: 100 },
-        { label: 'social life', value: 100 }
-      ],
-      [
-        { label: 'happiness', value: 50 },
-        { label: 'sentiment', value: 10 },
-        { label: 'social life', value: 50 }
-      ]
-    ];
-
-    const stats = [
-      {
-        title: 'Work',
-        icon: 'business-center',
-        note: 'You seem to enjoy working, keep on!'
-      },
-      {
-        title: 'Study',
-        icon: 'school',
-        note: 'You should consider changing edu-line.'
-      },
-      {
-        title: 'Family',
-        icon: 'people',
-        note: 'Spend more time with your family'
-      },
-      {
-        title: 'Sport',
-        icon: 'directions-bike',
-        note: 'You feel comfortable doing sport, that\'s cool!'
-      }
-    ];
-
     const axesSvg = { fontSize: 14, fill: 'grey' };
     const verticalContentInset = { top: 10, bottom: 10 };
     const xAxisHeight = 10;
     const fill = PRIMARY;
 
-    return stats.map((cardData, index) => {
-      chartNumbers = data[index]
+    return this.stats.map((cardData, index) => {
+      chartNumbers = this.state.data[index]
       return (
         <Card key={cardData.title}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -98,7 +79,7 @@ export class StatisticsScreen extends React.Component {
               />
             </View>
           </View>
-          <TouchableOpacity onPress={() => { this.naviateToStatDetail(cardData.title) }}>
+          <TouchableOpacity onPress={() => { this.navigateToStatDetail(cardData.title) }}>
             <Text style={more}>MORE</Text>
           </TouchableOpacity>
         </Card>
@@ -106,10 +87,49 @@ export class StatisticsScreen extends React.Component {
     });
   }
 
+  convertData(db) {
+    categorical_db = this.stats.map((category) => {
+      filtered_db = db.filter((element) => element[category.title.toLowerCase()])
+      return filtered_db
+    });
+    // cat_db is array of array of object, outer array is 4 length, the 4 categories, the inner contains the datapoint for a category, 
+    data_to_display = categorical_db.map((category, i) => {
+      sum_happiness = category.reduce((sum,value) => {
+        return sum + (value.angle * value.range);
+      }, 0)
+      avg_happiness = (sum_happiness / category.length / 180) + 50 //to have a scale between 0-100
+      sum_social_rate = category.reduce((sum,value) => {
+        return sum + value.social_rate;
+      }, 0)
+      avg_social_rate = sum_social_rate / category.length / 5 * 100
+      return [
+        { label: 'happiness', value: avg_happiness },
+        { label: 'sentiment', value: 0 },
+        { label: 'social life', value: avg_social_rate }
+      ];
+    });
+    return data_to_display
+  }
+
+  async componentWillMount() {
+    const database_string = await AsyncStorage.getItem("db");
+    if (!database_string) return;
+
+    const database = JSON.parse(database_string);
+
+    if (database !== []) {
+      // console.log(database);
+      const data_to_display = this.convertData(database);
+      this.setState({ showMessage: false, data: data_to_display});
+    } else {
+      // handle empty array
+    }
+  }
+  
   render() {
     return (
       <ScrollView style={{ flex: 1, backgroundColor: GREY, paddingTop: 4 }}>
-        {this.renderCards()}
+        {this.state.showMessage ? this.renderMessage() : this.renderCards()}
         <View style={{ height: 8, width: '100%' }}/>
       </ScrollView>
     );
